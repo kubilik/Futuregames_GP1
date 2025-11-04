@@ -10,27 +10,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
       propertyPath: m_LocalScale.x
-      value: 140
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
       propertyPath: m_LocalScale.y
-      value: 140
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
       propertyPath: m_LocalScale.z
-      value: 140
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.0656762
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.99999976
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.2602797
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -67,6 +67,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
       propertyPath: m_Name
       value: Campfire_Log
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ddbdc3ec3269f374a8b1150c927d3ad9, type: 3}
       propertyPath: m_TagString

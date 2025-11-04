@@ -13,7 +13,7 @@ namespace PlayerScripts
         [Tooltip("Max distance the player can interact from.")]
         [SerializeField] private float interactionDistance = 2f;
         
-        [Tooltip("The tag used to identify general interactable objects (e.g., doors).")]
+        [Tooltip("The tag used to identify general interactable objects (e.g., Tents).")]
         [SerializeField] private string interactableTag = "Interactable";
 
         [Tooltip("The tag used to identify instant collectible objects (e.g., axe, lantern).")]
@@ -110,7 +110,7 @@ namespace PlayerScripts
 
                 // --- PROMPT DISPLAY PRIORITY ---
                 
-                // Priority 1: Interactable (e.g., Fireplace)
+                // Priority 1: Interactable (e.g., Fireplace or Tent)
                 if (_currentInteractable != null)
                 {
                     OnInteractionPromptChange?.Invoke(_currentInteractable.InteractionPrompt);
@@ -123,21 +123,19 @@ namespace PlayerScripts
                 // Priority 3: Drop Axe OR Chop Wood
                 else if (_playerInventory.HasAxe)
                 {
-                    if (_currentChopTarget != null) // If holding axe AND near a tree
+                    if (_currentChopTarget != null) 
                     {
-                        OnInteractionPromptChange?.Invoke("Chop Wood"); // Show Chop Wood prompt
+                        OnInteractionPromptChange?.Invoke("Chop Wood"); 
                     }
                     else
                     {
                         OnInteractionPromptChange?.Invoke("Drop Axe");
                     }
                 }
-                // Priority 4: Drop Wood (if carrying it, and not dealing with Axe/Lantern/Interactable)
                 else if (_playerInventory.HasWood) 
                 {
                     OnInteractionPromptChange?.Invoke("Drop Wood");
                 }
-                // Priority 5: Fallback to the closest collectible prompt
                 else
                 {
                     OnInteractionPromptChange?.Invoke(newPrompt);
@@ -175,14 +173,19 @@ namespace PlayerScripts
                 return; 
             }
             
-            // Re-run candidate check to ensure we have the most up-to-date targets
             UpdateInteractionCandidate(forceUpdate: true);
             
-            // PRIORITY 1: GENERAL INTERACTABLE (E.G., FIREPLACE)
+            // PRIORITY 1: GENERAL INTERACTABLE (TENT, FIREPLACE, ETC.)
             if (_currentInteractable != null)
             {
-                // Condition check: For the fireplace, we require wood before entering IsInteracting state.
-                if (_playerInventory.HasWood)
+                // The Tent ("Tent" prompt) does NOT require wood. 
+                // Any other interactable (like a Fireplace) is assumed to require wood.
+                bool isWoodRequired = (_currentInteractable.InteractionPrompt != "Tent"); 
+                
+                // Interaction is allowed if wood is NOT required, OR if wood IS required and the player has it.
+                bool interactionAllowed = !isWoodRequired || _playerInventory.HasWood;
+
+                if (interactionAllowed)
                 {
                     Debug.Log($"[DEBUG: INTERACT] Starting long interaction with: {_currentInteractable.InteractionPrompt}. Player state locked to IsInteracting.");
                     
@@ -191,8 +194,8 @@ namespace PlayerScripts
                 }
                 else
                 {
-                    // Log failure, but DO NOT set IsInteracting state.
-                    Debug.Log("[DEBUG: INTERACT FAIL] Cannot interact with fireplace. Player lacks wood.");
+                    // Log failure for the wood-requiring interaction only.
+                    Debug.Log("[DEBUG: INTERACT FAIL] Cannot interact. Player lacks required inventory item (wood).");
                 }
                 
                 // CRITICAL: Stop processing other actions (like dropping axes/logs) below.

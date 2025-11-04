@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CampScene_Version1_Blockout.unity
     guid: f33dad3fa5da0074fa1ce96aa1935d89
+  - enabled: 1
+    path: Assets/Scenes/AlphaScene.unity
+    guid: 7fbde5231fd362247a5f9968ae777614
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: f6f41b6b11bf338478170db278bbf41d, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

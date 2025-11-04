@@ -4,7 +4,7 @@ using PlayerScripts;
 
 namespace GamePlay.Interactables
 {
-    public class NewMonoBehaviourScript : MonoBehaviour , IInteractable
+    public class TrashBox : MonoBehaviour , IInteractable
     {
         public string InteractionPrompt { get; } = "Trash box";
 

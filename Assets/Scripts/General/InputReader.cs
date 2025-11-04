@@ -10,10 +10,13 @@ namespace General
         Gamepad,
         Unknown 
     }
-    public class InputReader : MonoBehaviour, IInputService, InputSystem_Actions.IPlayerActions 
+    
+    public class InputReader : MonoBehaviour, IInputService, InputSystem_Actions.IPlayerActions, InputSystem_Actions.IUIActions
     {
         // --- IInputService Contract Members ---
+        // RENAMED: Changed to OnControlStateChange to resolve CS0535
         public event Action<ControlDevice> OnControlSchemeChange;
+        public event Action<ControlDevice> OnControlStateChange;
         public ControlDevice CurrentControlDevice { get; private set; } = ControlDevice.Unknown;
         public event Action<Vector2> OnMoveEvent;
         public event Action OnSprintStarted;
@@ -21,6 +24,9 @@ namespace General
         public event Action<Vector2> OnSprintEvent;
 
         public event Action OnInteractEvent;
+        
+        // NEW: Pause event (matches IInputService)
+        public event Action OnPauseEvent;
         // -------------------------------------
         
         private InputSystem_Actions _inputsInstance;
@@ -29,6 +35,8 @@ namespace General
         {
             _inputsInstance = new InputSystem_Actions();
             _inputsInstance.Player.SetCallbacks(this);
+            // NEW: Set callbacks for the UI action map
+            _inputsInstance.UI.SetCallbacks(this); 
             
             try
             {
@@ -59,11 +67,15 @@ namespace General
         private void OnEnable()
         {
             _inputsInstance.Player.Enable();
+            // NEW: Enable UI map on start
+            _inputsInstance.UI.Enable(); 
             InputSystem.onDeviceChange += OnInputDeviceChange;
         }
         private void OnDisable()
         {
             _inputsInstance.Player.Disable();
+            // NEW: Disable UI map on cleanup
+            _inputsInstance.UI.Disable(); 
             InputSystem.onDeviceChange -= OnInputDeviceChange;
         }
         private void OnInputDeviceChange(InputDevice device, InputDeviceChange change)
@@ -101,14 +113,61 @@ namespace General
         }
         
         #endregion
+        
+        #region General Interaction
         public void OnInteract(InputAction.CallbackContext context)
         {
-            if (context.started ||context.performed) 
+            if (context.started) 
             {
                 OnInteractEvent?.Invoke();
                 CheckAndReportDevice(context);
             }
         }
+        #endregion
+        
+        #region UI Actions
+        public void OnPauseGame(InputAction.CallbackContext context)
+        {
+            if (context.started)
+            {
+                CheckAndReportDevice(context);
+                Debug.Log($"[INPUT] Pause input received from {context.control.device.displayName}."); 
+                OnPauseEvent?.Invoke();
+            }
+        }
+        
+        public void EnableUIInput(bool enabled)
+        {
+            if (enabled)
+            {
+                _inputsInstance.UI.Enable();
+            }
+            else
+            {
+                _inputsInstance.UI.Disable();
+            }
+            Debug.Log($"[Input] UI Input Set to: {enabled}");
+        }
+        
+        public void DisablePlayerInput()
+        {
+            _inputsInstance.Player.Disable();
+            // Enable UI input when player is paused/in a menu
+            _inputsInstance.UI.Enable(); 
+            Debug.Log("[Input] Player Input Disabled, UI Input Enabled.");
+        }
+        
+        public void EnablePlayerInput()
+        {
+            // Disable UI input when returning to gameplay
+            _inputsInstance.UI.Disable(); 
+            // Enable the Player control map
+            _inputsInstance.Player.Enable();
+            Debug.Log("[Input] Player Input Enabled.");
+        }
+        
+        #endregion
+        
         private void CheckAndReportDevice(InputAction.CallbackContext context)
         {
             ControlDevice detectedDevice = GetDeviceFromControl(context.control);
@@ -121,7 +180,8 @@ namespace General
         private void SetNewControlDevice(ControlDevice newDevice)
         {
             CurrentControlDevice = newDevice;
-            OnControlSchemeChange?.Invoke(CurrentControlDevice);
+            // RENAMED: Invoking the corrected event name
+            OnControlStateChange?.Invoke(CurrentControlDevice);
             Debug.Log($"Control scheme switched to: {CurrentControlDevice}");
         }
         private ControlDevice GetDeviceFromControl(InputControl control)
@@ -146,6 +206,19 @@ namespace General
         public void OnPrevious(InputAction.CallbackContext context) { }
         public void OnNext(InputAction.CallbackContext context) { }
         
+        // UI Action Callbacks (Must exist to implement IUIActions)
+        public void OnNavigate(InputAction.CallbackContext context) { }
+        public void OnSubmit(InputAction.CallbackContext context) { }
+        public void OnCancel(InputAction.CallbackContext context) { }
+        public void OnPoint(InputAction.CallbackContext context) { }
+        public void OnClick(InputAction.CallbackContext context) { }
+        public void OnScrollWheel(InputAction.CallbackContext context) { }
+        public void OnMiddleClick(InputAction.CallbackContext context) { }
+        public void OnRightClick(InputAction.CallbackContext context) { }
+        public void OnTrackedDevicePosition(InputAction.CallbackContext context) { }
+        public void OnTrackedDeviceOrientation(InputAction.CallbackContext context) { }
+            
+        //public void OnControlSchemeChange(InputAction.CallbackContext context) { }
         #endregion
     }
 }
